@@ -1,12 +1,17 @@
 # Sample Azure Templates
 Create resource group:
 ```
-New-AzResourceGroup -Name azgrarg
+New-AzResourceGroup -Name azgrarg -Location eastus
 ```
 
-Deploy template:
+Validate template:
 ```
-New-AzResourceGroupDeployment -ResourceGroupName azgrarg -TemplateFile ./template.json -TemplateParameterFile ./parameters.json
+Test-AzResourceGroupDeployment -ResourceGroupName azgrarg -TemplateFile ./ubuntu-vm.json -TemplateParameterFile ./ubuntu-vm-parameters.json
+```
+
+Deploy template (*Note: run `Test-AzResourceGroupDeployment` with the same parameters to validate the template without deploying):
+```
+New-AzResourceGroupDeployment -ResourceGroupName azgrarg -TemplateFile ./ubuntu-vm.json -TemplateParameterFile ./ubuntu-vm-parameters.json
 ```
 
 Remove resource group and resources:
