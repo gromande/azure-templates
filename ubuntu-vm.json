@@ -93,6 +93,20 @@
         "metadata": {
           "description": "Name of the Network Security Group"
         }
+      },
+      "_artifactsLocation": {
+        "type": "string",
+        "metadata": {
+          "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
+        },
+        "defaultValue": "[deployment().properties.templateLink.uri]"
+      },
+      "_artifactsLocationSasToken": {
+        "type": "securestring",
+        "metadata": {
+          "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated."
+        },
+        "defaultValue": ""
       }
     },
     "variables": {
@@ -246,7 +260,30 @@
             "adminPassword": "[parameters('adminPasswordOrKey')]",
             "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), json('null'), variables('linuxConfiguration'))]"
           }
-        }
+        },
+        "resources": [
+          {
+            "type": "Extensions",
+            "apiVersion": "2019-12-01",
+            "name": "installDependencies",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+              "[concat('Microsoft.Compute/virtualMachines/', parameters('vmName'))]"
+            ],
+            "properties": {
+              "publisher": "Microsoft.Azure.Extensions",
+              "type": "CustomScript",
+              "typeHandlerVersion": "2.1",
+              "autoUpgradeMinorVersion": true,
+              "settings": {
+                "fileUris": [
+                  "[uri(parameters('_artifactsLocation'), concat('scripts/apt-install-openjdk.sh', parameters('_artifactsLocationSasToken')))]"
+                ],
+                "commandToExecute": "bash apt-install-openjdk.sh"
+              }
+            }
+          }
+        ]
       }
     ],
     "outputs": {
